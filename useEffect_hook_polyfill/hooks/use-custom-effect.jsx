@@ -6,8 +6,12 @@ const useCustomEffect = (effect, deps) => {
 
   if (isFirstRender.current) {
     isFirstRender.current = false;
-    effect();
-    return;
+    const cleanup = effect();
+    return () => {
+      if (cleanup && typeof cleanup === "function") {
+        cleanup();
+      }
+    };
   }
 
   const depsChanged = deps
@@ -15,7 +19,11 @@ const useCustomEffect = (effect, deps) => {
     : true;
 
   if (depsChanged) {
-    effect();
+    const cleanup = effect();
+    //cleanup
+    if (cleanup && typeof cleanup === "function" && deps) {
+      cleanup();
+    }
   }
 
   prevDeps.current = deps || [];

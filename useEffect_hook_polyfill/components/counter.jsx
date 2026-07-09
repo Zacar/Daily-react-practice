@@ -7,7 +7,11 @@ function Counter() {
 
   useCustomEffect(() => {
     console.log("hello effect if triggered");
-  }, [count]);
+
+    return () => {
+      console.log("cleanup");
+    };
+  }, []);
 
   console.log("helllo every time");
 
