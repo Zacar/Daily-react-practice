@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import useThrottle from "./hooks/use-throttle";
 
 function App() {
   const [windowSize, setWindowSize] = useState({
@@ -16,13 +17,13 @@ function App() {
     //suppose any expensive operation or api call
   };
 
-  // const throttledHandleResize = useThrottle(handleResize, 500);
+  const throttledHandleResize = useThrottle(handleResize, 1000);
 
   useEffect(() => {
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", throttledHandleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", throttledHandleResize);
     };
   }, []);
 
