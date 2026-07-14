@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Home from "./pages/home";
 import ProductListing from "./pages/product-listing";
 import ProductDetails from "./pages/product-details";
+import Breadcrumbs from "./components/breadcrumbs";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <h1>Sakar Store</h1>
 
         {/* breadcrumbs  */}
+        <Breadcrumbs />
 
         {/* routes */}
         <Routes>
