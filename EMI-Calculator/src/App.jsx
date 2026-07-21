@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import "./App.css";
+import { tenureData } from "./utils/constants";
 
 function App() {
   const [cost, setCost] = useState(0);
@@ -10,8 +11,34 @@ function App() {
   const [tenure, setTenure] = useState(12);
   const [emi, setEmi] = useState(0);
 
-  const updateEMI = () => {};
-  const updateDownPayment = () => {};
+  const calculateEMI = (downPayment) => {
+    if (!cost) return;
+    const loanAmt = cost - downPayment;
+    const rateOfInterest = interest / 100;
+    const numOfYears = tenure / 12;
+
+    const EMI =
+      (loanAmt * rateOfInterest * (1 + rateOfInterest) ** numOfYears) /
+      ((1 + rateOfInterest) ** numOfYears - 1);
+
+    return Number(EMI / 12).toFixed(0);
+  };
+
+  const updateEMI = (e) => {
+    if (!cost) return;
+
+    const dp = Number(e.target.value);
+    setDownPayment(dp.toFixed(0));
+
+    const emi = calculateEMI(dp);
+    setEmi(emi);
+  };
+  const updateDownPayment = (e) => {
+    if (!cost) return;
+
+    const emi = Number(e.target.value);
+    setEmi(emi.toFixed(0));
+  };
 
   return (
     <div className="App">
@@ -42,27 +69,55 @@ function App() {
       />
 
       <span className="title">Down Payment</span>
-      <input
-        type="range"
-        min={0}
-        max={cost}
-        className="slider"
-        value={downPayment}
-        onChange={updateEMI}
-      />
+      <div>
+        <input
+          type="range"
+          min={0}
+          max={cost}
+          className="slider"
+          value={downPayment}
+          onChange={updateEMI}
+        />
+        <div className="labels">
+          <label>0%</label>
+          <b>{downPayment}</b>
+          <label>100%</label>
+        </div>
+      </div>
 
       <span className="title">Loan per Month</span>
-
-      <input
-        type="range"
-        min={0}
-        max={cost}
-        className="slider"
-        value={emi}
-        onChange={updateDownPayment}
-      />
+      <div>
+        {" "}
+        <input
+          type="range"
+          min={calculateEMI(cost)}
+          max={calculateEMI(0)}
+          className="slider"
+          value={emi}
+          onChange={updateDownPayment}
+        />
+        <div className="labels">
+          <label>{calculateEMI(cost)}</label>
+          <b>{emi}</b>
+          <label>{calculateEMI(0)}</label>
+        </div>
+      </div>
 
       <span className="title">Tenure</span>
+      <div className="tenureContainer">
+        {tenureData.map((t) => {
+          return (
+            <button
+              className={`tenure ${t === tenure ? "selected" : ""}`}
+              onClick={() => {
+                setTenure(t);
+              }}
+            >
+              {t}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
