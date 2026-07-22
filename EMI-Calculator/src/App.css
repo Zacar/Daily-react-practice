@@ -12,6 +12,12 @@ body {
 
 .title {
   font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
 }
 
 .slider {

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import TextInput from "./components/text-input";
 
+import SliderInput from "./components/slider-input";
 import "./App.css";
 import { tenureData } from "./utils/constants";
 
@@ -24,6 +26,22 @@ function App() {
     return Number(EMI / 12).toFixed(0);
   };
 
+  const calculateDP = (emi) => {
+    if (!cost) return;
+
+    const downPaymentPercent = 100 - (emi / calculateEMI(0)) * 100;
+
+    return Number((downPaymentPercent / 100) * cost).toFixed(0);
+  };
+
+  useEffect(() => {
+    if (!(cost > 0)) {
+      setDownPayment(0);
+      setEmi(0);
+    }
+    const emi = calculateEMI(downPayment);
+    setEmi(emi);
+  }, [tenure]);
   const updateEMI = (e) => {
     if (!cost) return;
 
@@ -38,6 +56,9 @@ function App() {
 
     const emi = Number(e.target.value);
     setEmi(emi.toFixed(0));
+
+    const dp = calculateDP(emi);
+    setDownPayment(dp);
   };
 
   return (
@@ -46,64 +67,48 @@ function App() {
         EMI Calculator
       </span>
 
-      <span className="title">Total Cost of Asset</span>
-      <input
-        type="number"
-        value={cost}
-        onChange={(e) => setCost(e.target.value)}
-        placeholder="Total Cost of Assets"
-      />
-      <span className="title">Interest Rate (in %)</span>
-      <input
-        type="number"
-        value={interest}
-        onChange={(e) => setCost(e.target.value)}
-        placeholder="Interest Rate (in %)"
-      />
-      <span className="title">Processing Fee (in %)</span>
-      <input
-        type="number"
-        value={fee}
-        onChange={(e) => setCost(e.target.value)}
-        placeholder="Processing Fee (in %)"
+      <TextInput
+        title={"Total Cost of Asset"}
+        state={cost}
+        setState={setCost}
       />
 
-      <span className="title">Down Payment</span>
-      <div>
-        <input
-          type="range"
-          min={0}
-          max={cost}
-          className="slider"
-          value={downPayment}
-          onChange={updateEMI}
-        />
-        <div className="labels">
-          <label>0%</label>
-          <b>{downPayment}</b>
-          <label>100%</label>
-        </div>
-      </div>
+      <TextInput
+        title={"Interest Rate (in %)"}
+        state={interest}
+        setState={setInterest}
+      />
+      <TextInput
+        title={"Processing Fee (in %)"}
+        state={fee}
+        setState={setFee}
+      />
 
-      <span className="title">Loan per Month</span>
-      <div>
-        {" "}
-        <input
-          type="range"
-          min={calculateEMI(cost)}
-          max={calculateEMI(0)}
-          className="slider"
-          value={emi}
-          onChange={updateDownPayment}
-        />
-        <div className="labels">
-          <label>{calculateEMI(cost)}</label>
-          <b>{emi}</b>
-          <label>{calculateEMI(0)}</label>
-        </div>
-      </div>
+      <SliderInput
+        title="Down Payment"
+        underlineTitle={`Total Down Payment -
+        ${(Number(downPayment) + (cost - downPayment) * (fee / 100)).toFixed(
+          0
+        )}`}
+        onChange={updateEMI}
+        state={downPayment}
+        min={0}
+        max={cost}
+        labelMin={"0%"}
+        labelMax={"100%"}
+      />
+      <SliderInput
+        title="Loan per Month"
+        underlineTitle={`Total Loan Amount -
+        ${(emi * tenure).toFixed(0)}`}
+        onChange={updateDownPayment}
+        state={emi}
+        min={calculateEMI(cost)}
+        max={calculateEMI(0)}
+      />
 
       <span className="title">Tenure</span>
+
       <div className="tenureContainer">
         {tenureData.map((t) => {
           return (
