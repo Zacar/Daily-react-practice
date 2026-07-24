@@ -1,34 +1,57 @@
+import { useState } from "react";
 import "./App.css";
+import usePasswordGenerator from "./hooks/use-password-generator";
 
 function App() {
-  const checkboxData = [
-    { title: "Include UppercaseLetters", state: false },
+  const [length, setLength] = useState(4);
+  const [checkboxData, setCheckboxData] = useState([
+    { title: "Include Uppercase Letters", state: false },
     { title: "Include LowerCase Letters", state: false },
     { title: "Include Numbers", state: false },
     { title: "Include Symbols", state: false },
-  ];
+  ]);
+  const handleCheckboxChange = (i) => {
+    const updatedCheckboxData = [...checkboxData];
+    updatedCheckboxData[i].state = !updatedCheckboxData[i].state;
+    setCheckboxData(updatedCheckboxData);
+  };
+
+  const { password, errorMessage, generatePassword } = usePasswordGenerator;
   return (
     <>
       <div className="container">
-        <div className="header">
-          <div className="title">kh6#hjafd$</div>
-          <button className="copyBtn" onClick={() => {}}>
-            Copy
-          </button>
-        </div>
-
+        {password && (
+          <div className="header">
+            <div className="title">{password}</div>
+            <button className="copyBtn" onClick={() => {}}>
+              Copy
+            </button>
+          </div>
+        )}
         <div className="charlength">
           <span>
             <label>Character Length</label>
-            <label htmlFor="">4</label>
+            <label htmlFor="">{length}</label>
           </span>
-          <input type="range" min="4" max="20" />
+          <input
+            type="range"
+            min="4"
+            max="20"
+            value={length}
+            onChange={(e) => setLength(e.target.value)}
+          />
         </div>
         <div className="checkboxes">
-          {checkboxData.map((checkbox, i) => {
+          {checkboxData.map((checkbox, index) => {
             return (
-              <div key={i}>
-                <input type="checkbox" checked={checkbox.state} />
+              <div key={index}>
+                <input
+                  type="checkbox"
+                  onChange={() => {
+                    handleCheckboxChange(index);
+                  }}
+                  checked={checkbox.state}
+                />
                 <label htmlFor="">{checkbox.title}</label>
               </div>
             );
