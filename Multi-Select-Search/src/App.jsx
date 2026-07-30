@@ -1,8 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+
+  //https://dummyjson.com/users/search?q=John
+
+  useEffect(() => {
+    const fetchUsers = () => {
+      if (searchTerm.trim() === "") {
+        setSuggestions([]);
+        return;
+      }
+
+      fetch(`https://dummyjson.com/users/search?q=${searchTerm}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setSuggestions(data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+    fetchUsers();
+  }, [searchTerm]);
+
   return (
     <div className="user-search-container">
       <div className="user-search-input">
@@ -19,6 +42,21 @@ function App() {
             placeholder="Search for a User...."
           />
           {/* search suggestions */}
+          <ul className="suggestions-list">
+            {suggestions?.users?.map((user, index) => {
+              return (
+                <li key={user.email}>
+                  <img
+                    src={user.image}
+                    alt={`${user.firstName} ${user.lastName}`}
+                  />
+                  <span>
+                    {user.firstName} {user.lastName}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
     </div>
