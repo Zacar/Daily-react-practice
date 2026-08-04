@@ -33,11 +33,17 @@ const OtpInput = ({ length = 4, onOtpSubmit = () => {} }) => {
 
   const handleClick = (index) => {
     inputRefs.current[index].setSelectionRange(1, 1);
-    //more vallidation
+    //more vallidation empty field is focus
     if (index > 0 && !otp[index - 1]) {
       inputRefs.current[otp.indexOf("")].focus();
     }
+
+    // //focus on the empty block when clicked on
+    // if (index < length - 1 && inputRefs.current[otp.indexOf("")]) {
+    //   inputRefs.current[otp.indexOf("")].focus();
+    // }
   };
+
   const handleKeyDown = (index, e) => {
     if (
       e.key === "Backspace" &&
