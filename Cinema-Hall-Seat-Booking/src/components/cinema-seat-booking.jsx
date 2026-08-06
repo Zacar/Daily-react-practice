@@ -9,7 +9,7 @@ const CinemaSeatBooking = ({
   seatTypes = {
     regular: { name: "Regular", price: 150, rows: [0, 1, 2] },
     premium: { name: "Premium", price: 250, rows: [3, 4, 5] },
-    vip: { name: "VIP", price: 350, rows: [8, 7] },
+    vip: { name: "VIP", price: 350, rows: [6, 7] },
   },
   bookedSeats = [],
   currency = "$",
@@ -17,7 +17,32 @@ const CinemaSeatBooking = ({
   title = "Cinema Hall Booking",
   subtitle = "Select your preferred seats",
 }) => {
-  const getSeatType = () => {};
+  const colors = [
+    "blue",
+    "purple",
+    "yellow",
+    "green",
+    "red",
+    "indigo",
+    "pink",
+    "gray",
+  ];
+
+  const getSeatType = (row) => {
+    const seatTypeEntires = Object.entries(seatTypes);
+
+    for (let i = 0; i < seatTypeEntires.length; i++) {
+      const [type, config] = seatTypeEntires[i];
+
+      if (config.rows.includes(row)) {
+        const color = colors[i % colors.length];
+        return { type, color, ...config };
+      }
+    }
+
+    const [firstType, firstConfig] = seatTypeEntires[0];
+    return { type: firstType, color: colors[0], ...firstConfig };
+  };
 
   const initializeSeats = useMemo(() => {
     const seats = [];
@@ -42,9 +67,66 @@ const CinemaSeatBooking = ({
     }
     return seats;
   }, [layout, seatTypes, bookedSeats]);
-  const [seats, setSeats] = useState(initializeSeats);
 
-  const renderSeatSection = (seatRow, startIndex, endIndex) => {};
+  const [seats, setSeats] = useState(initializeSeats);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+
+  const getColorClass = (colorName) => {
+    const colorMap = {
+      blue: "bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200",
+      purple:
+        "bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200",
+      yellow:
+        "bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200",
+      green: "bg-green-100 border-green-300 text-green-800 hover:bg-green-200",
+      red: "bg-red-100 border-red-300 text-red-800 hover:bg-red-200",
+      indigo:
+        "bg-indigo-100 border-indigo-300 text-indigo-800 hover:bg-indigo-200",
+      pink: "bg-pink-100 border-pink-300 text-pink-800 hover:bg-pink-200",
+      gray: "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200",
+    };
+
+    return colorMap[colorName] || colorMap.blue;
+  };
+
+  const getSeatClassName = (seat) => {
+    const baseClass =
+      "w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 m-1 rounded-t-lg border-2 cursor-pointer transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-bold";
+    if (seat.status === "booked") {
+      return `${baseClass} bg-gray-400 border-gray-600 text-gray-600 cursor-not-allowed`;
+    }
+
+    if (seat.selected) {
+      return `${baseClass} bg-green-500 border-green-600 text-white transform scale-110`;
+    }
+
+    return `${baseClass} ${getColorClass(seat.color)}`;
+  };
+
+  const handleSeatClick = (rowIndex, seatIndex) => {};
+
+  const renderSeatSection = (seatRow, startIndex, endIndex) => {
+    return (
+      <div className="flex">
+        {seatRow.slice(startIndex, endIndex).map((seat, index) => {
+          return (
+            <div
+              className={getSeatClassName(seat)}
+              key={seat.id}
+              title={`${seat.id}  - ${
+                getSeatType(seat.row)?.name || "Regular"
+              } - ${currency}${seat.price}`}
+              onClick={() => {
+                handleSeatClick(seat.row, startIndex + index);
+              }}
+            >
+              {startIndex + index + 1}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4">
       {/* title */}
@@ -71,6 +153,7 @@ const CinemaSeatBooking = ({
                   </span>
                   {renderSeatSection(row, 0, layout.aislePosition)}
                   {/* aisle */}
+                  <div className="w-8"></div>
                   {renderSeatSection(
                     row,
                     layout.aislePosition,
