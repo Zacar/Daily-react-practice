@@ -29,6 +29,12 @@ const explorer = {
         },
       ],
     },
+    {
+      id: "6",
+      name: "sakar.html",
+      isFolder: false,
+      items: [],
+    },
   ],
 };
 
