@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const MemoryGame = () => {
   const [gridSize, setGridSize] = useState(4);
@@ -13,6 +13,33 @@ const MemoryGame = () => {
     const size = parseInt(e.target.value);
     if (size >= 2 && size <= 10) setGridSize(size);
   };
+
+  const initializeGame = () => {
+    const totalCards = gridSize * gridSize; //16
+    const pairCount = Math.floor(totalCards / 2); //8
+
+    const numbers = [...Array(pairCount).keys()].map((n) => n + 1);
+
+    const shuffledCards = [...numbers, ...numbers]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, totalCards)
+      .map((number, index) => {
+        return {
+          id: index,
+          number: number,
+        };
+      });
+    setCards(shuffledCards);
+    setFlipped([]);
+    setSolved([]);
+    setWon(false);
+  };
+
+  useEffect(() => {
+    initializeGame();
+  }, [gridSize]);
+
+  const handleClick = () => {};
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-grey-100 p-4">
@@ -33,6 +60,26 @@ const MemoryGame = () => {
         />
       </div>
       {/* Gmae board */}
+      <div
+        className={`grid gap-2 mb-4`}
+        style={{
+          gridTemplateColumns: `repeat(${gridSize},minmax(0,1fr))`,
+          width: `min(100%,${gridSize * 5.5}rem)`,
+        }}
+      >
+        {cards.map((card) => {
+          return (
+            <div
+              key={card.key}
+              onClick={handleClick}
+              className="aspect-square flex items-center justify-center text-xl font-bold rounded-lg cursor-pointer transition-all
+              duration-300 bg-gray-300 text-gray-400 "
+            >
+              {card.number}
+            </div>
+          );
+        })}
+      </div>
 
       {/* Result */}
 
