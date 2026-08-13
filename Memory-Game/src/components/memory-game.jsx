@@ -39,7 +39,48 @@ const MemoryGame = () => {
     initializeGame();
   }, [gridSize]);
 
-  const handleClick = () => {};
+  const checkMatch = (secondId) => {
+    const [firstId] = flipped;
+    if (cards[firstId].number === cards[secondId].number) {
+      setSolved([...solved, firstId, secondId]);
+      setFlipped([]);
+      setDisabled(false);
+    } else {
+      setTimeout(() => {
+        setFlipped([]);
+        setDisabled(false);
+      }, 1000);
+    }
+  };
+
+  const handleClick = (id) => {
+    if (disabled || won) return;
+
+    if (flipped.length === 0) {
+      setFlipped([id]);
+      return;
+    }
+    if (flipped.length === 1) {
+      setDisabled(true);
+      if (id !== flipped[0]) {
+        setFlipped([...flipped, id]);
+        //check match logic
+        checkMatch(id);
+      } else {
+        setFlipped([]);
+        setDisabled(false);
+      }
+    }
+  };
+
+  const isFlipped = (id) => flipped.includes(id) || solved.includes(id);
+  const isSolved = (id) => solved.includes(id);
+
+  useEffect(() => {
+    if (solved.length === cards.length && cards.length > 0) {
+      setWon(true);
+    }
+  }, [solved, cards]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-grey-100 p-4">
@@ -70,20 +111,37 @@ const MemoryGame = () => {
         {cards.map((card) => {
           return (
             <div
-              key={card.key}
-              onClick={handleClick}
-              className="aspect-square flex items-center justify-center text-xl font-bold rounded-lg cursor-pointer transition-all
-              duration-300 bg-gray-300 text-gray-400 "
+              key={card.id}
+              onClick={() => handleClick(card.id)}
+              className={`aspect-square flex items-center justify-center text-xl font-bold rounded-lg cursor-pointer transition-all
+              duration-300 ${
+                isFlipped(card.id)
+                  ? isSolved(card.id)
+                    ? "bg-green-500 text-white"
+                    : "bg-blue-500 text-white"
+                  : "bg-gray-300 text-gray-400"
+              }`}
             >
-              {card.number}
+              {isFlipped(card.id) ? card.number : "?"}
             </div>
           );
         })}
       </div>
 
       {/* Result */}
+      {won && (
+        <div className="mt-4 text-4xl font-bold text-green-600 animate-bounce">
+          You Won!
+        </div>
+      )}
 
       {/* rESET/play again btn */}
+      <button
+        onClick={initializeGame}
+        className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors cursor-pointer"
+      >
+        {won ? "Play Again" : "Reset"}
+      </button>
     </div>
   );
 };
