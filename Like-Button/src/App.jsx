@@ -23,21 +23,28 @@ function App() {
           }),
         }
       );
-      console.log(await response.json());
+      if (response.status >= 200 && response.status < 300) {
+        setLiked(!liked);
+      } else {
+        const res = await response.json();
+        setError(res.message);
+        return;
+      }
     } finally {
       SetIsFetching(false);
     }
-
-    setLiked(!liked);
   };
   return (
     <div>
       <button
+        disabled={isFetching}
         className={`LikeBtn ${liked ? "liked" : ""}`}
         onClick={handleLikeUnLike}
       >
-        <HeartIcon /> {liked ? "Liked" : "Like"}
+        {isFetching ? <SpinnerIcon /> : <HeartIcon />}{" "}
+        {liked ? "Liked" : "Like"}
       </button>
+      {error && <div className="error">{error}</div>}
     </div>
   );
 }
