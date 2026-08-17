@@ -7,10 +7,25 @@ i18n
   .use(initReactI18next)
   .init({
     debug: true,
-    lng: "en",
+    lng: "ne",
+    fallbackLng: "en",
+    defaultNS: "translations",
+
     resources: {
-      en: {},
-      fr: {},
-      hi: {},
+      en: {
+        translations: {
+          greeting: "Hello, Welcome!",
+        },
+      },
+      fr: {
+        translations: {
+          greeting: "Bonjour, Bienvenue !",
+        },
+      },
+      ne: {
+        translations: {
+          greeting: "नमस्कार, स्वागत छ!",
+        },
+      },
     },
   });
